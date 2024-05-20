@@ -26,7 +26,7 @@ contract FundMeTest is Test {
     }
 
     function testOwnerIsMessageSender() public {
-        assertEq(fundMe.i_owner(), msg.sender);
+        assertEq(fundMe.getOwner(), msg.sender);
     }
 
     function testPriceFeedVersionIsAccurate() public {
@@ -85,6 +85,37 @@ contract FundMeTest is Test {
         assertEq(
             startingFundMeBalance + startingOwnerBalance,
             endingOwnerBalance
+        );
+    }
+
+    function testWithdrawFromMultipleAddress() public {
+        //Arrange
+        uint160 numberOfFunders = 10;
+        uint160 startingFunderIndex = 1;
+
+        for (uint160 i = startingFunderIndex; i < numberOfFunders; i++) {
+            //vm.prank new address
+            //vm.deal new address
+            // address()
+            //hoax is foege standard library which equals vm.prank + vm.deal
+
+            hoax(address(i), SEND_VALUE);
+            fundMe.fund{value: SEND_VALUE}();
+        }
+
+        uint256 startingOwnerBalance = fundMe.getOwner().balance;
+        uint256 startingFundMeBalance = address(fundMe).balance;
+
+        //Act
+        vm.startPrank(fundMe.getOwner());
+        fundMe.withdraw();
+        vm.stopPrank();
+
+        //Assert
+        assertEq(address(fundMe).balance, 0);
+        assertEq(
+            startingOwnerBalance + startingFundMeBalance,
+            fundMe.getOwner().balance
         );
     }
 }
