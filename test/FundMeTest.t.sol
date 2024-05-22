@@ -88,7 +88,7 @@ contract FundMeTest is Test {
         );
     }
 
-    function testWithdrawFromMultipleAddress() public {
+    function testWithdrawFromMultipleFunders() public {
         //Arrange
         uint160 numberOfFunders = 10;
         uint160 startingFunderIndex = 1;
@@ -112,10 +112,53 @@ contract FundMeTest is Test {
         vm.stopPrank();
 
         //Assert
+        // assert(address(fundMe).balance == 0);
         assertEq(address(fundMe).balance, 0);
-        assertEq(
-            startingOwnerBalance + startingFundMeBalance,
-            fundMe.getOwner().balance
+
+        assert(
+            startingOwnerBalance + startingFundMeBalance ==
+                fundMe.getOwner().balance
         );
+        // assertEq(
+        //     startingOwnerBalance + startingFundMeBalance,
+        //     fundMe.getOwner().balance
+        // );
+    }
+
+    function testWithdrawFromMultipleFundersCheaper() public {
+        //Arrange
+        uint160 numberOfFunders = 10;
+        uint160 startingFunderIndex = 1;
+
+        for (uint160 i = startingFunderIndex; i < numberOfFunders; i++) {
+            //vm.prank new address
+            //vm.deal new address
+            // address()
+            //hoax is foege standard library which equals vm.prank + vm.deal
+
+            hoax(address(i), SEND_VALUE);
+            fundMe.fund{value: SEND_VALUE}();
+        }
+
+        uint256 startingOwnerBalance = fundMe.getOwner().balance;
+        uint256 startingFundMeBalance = address(fundMe).balance;
+
+        //Act
+        vm.startPrank(fundMe.getOwner());
+        fundMe.cheaperWithdraw();
+        vm.stopPrank();
+
+        //Assert
+        // assert(address(fundMe).balance == 0);
+        assertEq(address(fundMe).balance, 0);
+
+        assert(
+            startingOwnerBalance + startingFundMeBalance ==
+                fundMe.getOwner().balance
+        );
+        // assertEq(
+        //     startingOwnerBalance + startingFundMeBalance,
+        //     fundMe.getOwner().balance
+        // );
     }
 }
