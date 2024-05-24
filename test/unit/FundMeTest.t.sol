@@ -3,8 +3,8 @@
 pragma solidity ^0.8.18;
 
 import {Test, console} from "forge-std/Test.sol";
-import {FundMe} from "../src/FundMe.sol";
-import {DeployFundMe} from "../script/DeployFundMe.s.sol";
+import {FundMe} from "../../src/FundMe.sol";
+import {DeployFundMe} from "../../script/DeployFundMe.s.sol";
 
 contract FundMeTest is Test {
     FundMe fundMe;
@@ -134,7 +134,7 @@ contract FundMeTest is Test {
             //vm.prank new address
             //vm.deal new address
             // address()
-            //hoax is foege standard library which equals vm.prank + vm.deal
+            //hoax is forge standard library which equals vm.prank + vm.deal
 
             hoax(address(i), SEND_VALUE);
             fundMe.fund{value: SEND_VALUE}();
